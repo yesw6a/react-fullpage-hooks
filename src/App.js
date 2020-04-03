@@ -1,24 +1,29 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React from "react";
+import "./App.css";
+import { Fullpage, FullpageItem } from "@/components/Fullpage";
 
 function App() {
+  const commonStyle = {
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center"
+  };
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <Fullpage>
+        <FullpageItem style={{ ...commonStyle, backgroundColor: "#f90" }}>
+          Page1
+        </FullpageItem>
+        <FullpageItem style={{ ...commonStyle, backgroundColor: "#f09" }}>
+          Page2
+        </FullpageItem>
+        <FullpageItem style={{ ...commonStyle, backgroundColor: "#f03" }}>
+          Page3
+        </FullpageItem>
+        <FullpageItem style={{ ...commonStyle, backgroundColor: "#b22" }}>
+          Page4
+        </FullpageItem>
+      </Fullpage>
     </div>
   );
 }

@@ -1,46 +1,139 @@
-import React, { useState, useEffect } from "react";
+import React, {
+  useState,
+  useLayoutEffect,
+  forwardRef,
+  useImperativeHandle,
+} from "react";
 import PropTypes from "prop-types";
+import ReactScrollWheelHandler from "react-scroll-wheel-handler";
+import throttle from "@/lib/throttle";
 
-// import styles from "./index.module.scss";
+import styles from "./Fullpage.module.scss";
 
-function Fullpage({ children, initPage }) {
+function FullpageComponent({ children, initPage, duration, direction }, ref) {
   const pageCount = children.length;
+  const isVertical = direction === "vertical";
 
   const [currentPage, setCurrentPage] = useState(0); // 当前页面
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 }); // 页面尺寸
+  const [offset, setOffset] = useState(0);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     init();
-    window.addEventListener("DOMMouseScroll", mouseScroll, false);
-    window.addEventListener("mousewheel", mouseScroll, false);
+    window.addEventListener("resize", onResize);
     return () => {
-      window.removeEventListener("DOMMouseScroll", mouseScroll);
-      window.removeEventListener("mousewheel", mouseScroll);
+      window.removeEventListener("resize", onResize);
     };
+    // eslint-disable-next-line
   }, []);
 
+  useLayoutEffect(() => {
+    const { width, height } = dimensions;
+    const _offset = currentPage * (isVertical ? height : width);
+    setOffset(_offset);
+    // eslint-disable-next-line
+  }, [currentPage, dimensions]);
+
   const init = () => {
+    getSize();
+    setCurrentPage(initPage);
+  };
+
+  const onResize = throttle(() => {
+    getSize();
+  }, 200);
+
+  // 获取并设置当前窗口尺寸
+  const getSize = () => {
     const _dimensions = {
       width: window.innerWidth,
-      height: window.innerHeight
+      height: window.innerHeight,
     };
-    setCurrentPage(initPage);
     setDimensions(_dimensions);
   };
 
-  const mouseScroll = () => {
-    console.log("mousewheel");
+  /**
+   * 翻页逻辑
+   * @param {number} n - 翻页参数，n<0：向前（上）翻n页，n>0：向后（下）翻n页
+   */
+  const scroll = (n) => {
+    if (n < 0 && currentPage === 0) {
+      return false;
+    }
+    if (n > 0 && currentPage === pageCount - 1) {
+      return false;
+    }
+    setCurrentPage(currentPage + n);
   };
 
-  return <div style={dimensions}>{children}</div>;
+  // 翻到下一页
+  const slideNext = () => {
+    scroll(1);
+  };
+
+  // 翻到上一页
+  const slidePrev = () => {
+    scroll(-1);
+  };
+
+  useImperativeHandle(ref, () => ({
+    slideNext,
+    slidePrev,
+  }));
+
+  const fullpageStyle = isVertical
+    ? {
+        flexDirection: "column",
+        width: dimensions.width,
+        height: dimensions.height * pageCount,
+      }
+    : {
+        flexDirection: "row",
+        width: dimensions.width * pageCount,
+        height: dimensions.height,
+      };
+
+  return (
+    <ReactScrollWheelHandler
+      className={styles.container}
+      style={dimensions}
+      upHandler={() => scroll(-1)}
+      downHandler={() => scroll(1)}
+    >
+      <div
+        className={styles.fullpage}
+        style={{
+          ...fullpageStyle,
+          display: "flex",
+          transform: `translate${isVertical ? "Y" : "X"}(${-offset}px)`,
+          transitionDuration: `${duration}s`,
+        }}
+      >
+        {children.map((item, index) => (
+          <div
+            key={index}
+            style={{ width: dimensions.width, height: dimensions.height }}
+          >
+            {item}
+          </div>
+        ))}
+      </div>
+    </ReactScrollWheelHandler>
+  );
 }
 
+const Fullpage = forwardRef(FullpageComponent);
+
 Fullpage.prototype = {
-  initPage: PropTypes.number
+  initPage: PropTypes.number,
+  duration: PropTypes.number,
+  direction: PropTypes.oneOf(["horizontal", "vertical"]),
 };
 
-Fullpage.default = {
-  initPage: 0
+Fullpage.defaultProps = {
+  initPage: 1,
+  duration: 0.3,
+  direction: "vertical",
 };
 
 export default Fullpage;

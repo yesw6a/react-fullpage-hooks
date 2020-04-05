@@ -6,11 +6,16 @@ import React, {
 } from "react";
 import PropTypes from "prop-types";
 import ReactScrollWheelHandler from "react-scroll-wheel-handler";
-import throttle from "@/lib/throttle";
+// import throttle from "@/lib/throttle";
+import debounce from "@/lib/debounce";
 
 import styles from "./Fullpage.module.scss";
+import Pagination from "./Pagination";
 
-function FullpageComponent({ children, initPage, duration, direction }, ref) {
+function FullpageComponent(
+  { children, initPage, duration, direction, pagination, paginationType },
+  ref
+) {
   const pageCount = children.length;
   const isVertical = direction === "vertical";
 
@@ -34,12 +39,17 @@ function FullpageComponent({ children, initPage, duration, direction }, ref) {
     // eslint-disable-next-line
   }, [currentPage, dimensions]);
 
+  useImperativeHandle(ref, () => ({
+    slideNext,
+    slidePrev,
+  }));
+
   const init = () => {
     getSize();
     setCurrentPage(initPage);
   };
 
-  const onResize = throttle(() => {
+  const onResize = debounce(() => {
     getSize();
   }, 200);
 
@@ -75,11 +85,6 @@ function FullpageComponent({ children, initPage, duration, direction }, ref) {
   const slidePrev = () => {
     scroll(-1);
   };
-
-  useImperativeHandle(ref, () => ({
-    slideNext,
-    slidePrev,
-  }));
 
   const fullpageStyle = isVertical
     ? {
@@ -118,6 +123,13 @@ function FullpageComponent({ children, initPage, duration, direction }, ref) {
           </div>
         ))}
       </div>
+      <Pagination
+        pagination={pagination}
+        paginationType={paginationType}
+        isVertical={isVertical}
+        pageCount={pageCount}
+        currentPage={currentPage}
+      />
     </ReactScrollWheelHandler>
   );
 }
@@ -128,6 +140,8 @@ Fullpage.prototype = {
   initPage: PropTypes.number,
   duration: PropTypes.number,
   direction: PropTypes.oneOf(["horizontal", "vertical"]),
+  pagination: PropTypes.bool,
+  paginationType: PropTypes.string,
 };
 
 Fullpage.defaultProps = {

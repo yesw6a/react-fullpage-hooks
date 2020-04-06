@@ -1,4 +1,4 @@
-.pagination {
+.paginationHorizontal {
   position: fixed;
   display: flex;
   flex-direction: row;
@@ -10,9 +10,20 @@
   bottom: 0;
 }
 
+.paginationVertical {
+  position: fixed;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 50px;
+  height: 100%;
+  right: 0;
+  top: 0;
+}
+
 .paginationDot {
   $DOT_SIZE: 5px;
-  margin: 0 5px;
   width: $DOT_SIZE;
   height: $DOT_SIZE;
   background-color: #fff;

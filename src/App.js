@@ -13,7 +13,7 @@ function App() {
 
   return (
     <div className="App">
-      <Fullpage ref={ref} direction="horizontal">
+      <Fullpage ref={ref} direction="vertical">
         <FullpageItem style={{ ...commonStyle, backgroundColor: "#f90" }}>
           Page1
           <button onClick={() => ref.current.slideNext()}>next</button>

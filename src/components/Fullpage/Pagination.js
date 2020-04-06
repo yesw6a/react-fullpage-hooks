@@ -1,5 +1,5 @@
 import React from "react";
-import PropTypes from "prop-types";
+// import PropTypes from "prop-types";
 import classNames from "classnames";
 
 import styles from "./Pagination.module.scss";
@@ -23,11 +23,13 @@ function Pagination({
   };
 
   const renderDot = () => {
+    const DOT_STYLE = isVertical ? { margin: "5px 0 " } : { margin: "0 5px" };
     return Array(pageCount)
       .fill("")
       .map((item, index) => (
         <div
           key={index}
+          style={DOT_STYLE}
           className={classNames(
             styles.paginationDot,
             currentPage === index ? styles.paginationDotActive : ""
@@ -36,7 +38,15 @@ function Pagination({
       ));
   };
 
-  return <div className={styles.pagination}>{renderIndicator()}</div>;
+  return (
+    <div
+      className={
+        isVertical ? styles.paginationVertical : styles.paginationHorizontal
+      }
+    >
+      {renderIndicator()}
+    </div>
+  );
 }
 
 Pagination.defaultProps = {

@@ -9,17 +9,17 @@
 
 ## 参数配置
 
-| 参数             | 说明                           | 类型     | 可选值                   | 默认值   |
-| ---------------- | ------------------------------ | -------- | ------------------------ | -------- |
-| initPage         | 初始页码                       | number   |                          | 0        |
-| direction        | 翻页模式                       | string   | `vertical`, `horizontal` | vertical |
-| duration         | 翻页动画持续时间（单位：毫秒） | number   |                          | 300      |
-| pageTimeout      | 翻页时间间隔（单位：毫秒）     | number   |                          | 300      |
-| pagination       | 轮播指示器                     | boolean  |                          | true     |
-| paginationType   | 轮播指示器类型                 | string   | `dot`, `number`          | dot      |
-| navigation       | 分页按钮                       | boolean  |                          | false    |
-| renderPrevButton | 渲染上一页分页按钮             | function |                          |          |
-| renderNextButton | 渲染下一页分页按钮             | function |                          |          |
+| 参数             | 说明                                         | 类型     | 可选值                   | 默认值   |
+| ---------------- | -------------------------------------------- | -------- | ------------------------ | -------- |
+| initPage         | 初始页码                                     | number   |                          | 0        |
+| direction        | 翻页模式                                     | string   | `vertical`, `horizontal` | vertical |
+| duration         | 翻页动画持续时间（单位：毫秒）               | number   |                          | 300      |
+| pageTimeout      | 翻页时间间隔（单位：毫秒）                   | number   |                          | 300      |
+| pagination       | 轮播指示器                                   | boolean  |                          | true     |
+| paginationType   | 轮播指示器类型                               | string   | `dot`, `number`          | dot      |
+| navigation       | 分页按钮（仅 `direction = vertical` 时有效） | boolean  |                          | false    |
+| renderPrevButton | 渲染上一页分页按钮                           | function |                          |          |
+| renderNextButton | 渲染下一页分页按钮                           | function |                          |          |
 
 ## 调用方法
 

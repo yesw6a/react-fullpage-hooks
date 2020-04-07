@@ -26,10 +26,14 @@ function App() {
     <div className="App">
       <Fullpage
         ref={ref}
-        direction={isMobile() ? "horizontal" : "vertical"}
+        // direction={isMobile() ? "horizontal" : "vertical"}
+        direction='horizontal'
         paginationType="dot"
         navigation
         renderPrevButton={() => <div>Prev</div>}
+        // scrollBar
+        responsiveHeight={800}
+        responsiveWidth={1200}
       >
         <FullpageItem style={{ ...commonStyle, backgroundColor: "#f90" }}>
           Page1

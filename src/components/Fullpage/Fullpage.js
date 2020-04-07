@@ -1,5 +1,6 @@
 import React, {
   useState,
+  useEffect,
   useLayoutEffect,
   forwardRef,
   useImperativeHandle
@@ -17,6 +18,7 @@ function FullpageComponent(
   {
     children,
     initPage,
+    scrollBar,
     duration,
     pageTimeout,
     direction,
@@ -24,7 +26,9 @@ function FullpageComponent(
     paginationType,
     navigation,
     renderPrevButton,
-    renderNextButton
+    renderNextButton,
+    responsiveWidth,
+    responsiveHeight
   },
   ref
 ) {
@@ -33,7 +37,10 @@ function FullpageComponent(
 
   const [currentPage, setCurrentPage] = useState(0); // 当前页面
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 }); // 页面尺寸
+  const [visibleNavigation, setVisibleNavigation] = useState(navigation); // 是否显示分页按钮
+  const [visiblePagination, setVisiblePagination] = useState(pagination);
   const [offset, setOffset] = useState(0);
+  const [pauseListenScrollWheel, setPauseListenScrollWheel] = useState(false);
 
   useLayoutEffect(() => {
     init();
@@ -57,6 +64,22 @@ function FullpageComponent(
     // eslint-disable-next-line
   }, [currentPage, dimensions]);
 
+  useEffect(() => {
+    const { width, height } = dimensions;
+    if (scrollBar || width <= responsiveWidth || height <= responsiveHeight) {
+      setPauseListenScrollWheel(true);
+      setOffset(0);
+      setVisibleNavigation(false);
+      setVisiblePagination(false);
+    } else {
+      setPauseListenScrollWheel(false);
+      setVisibleNavigation(navigation);
+      setVisiblePagination(pagination);
+    }
+    // eslint-disable-next-line
+  }, [dimensions]);
+
+  // 从ref导出可供外部调用的值或方法
   useImperativeHandle(ref, () => ({
     slideNext,
     slidePrev
@@ -78,10 +101,27 @@ function FullpageComponent(
 
   // 获取并设置当前窗口尺寸
   const getSize = () => {
-    const _dimensions = {
-      width: window.innerWidth,
-      height: window.innerHeight
-    };
+    const viewPortWidth =
+      window.innerWidth ||
+      document.documentElement.clientWidth ||
+      document.body.clientWidth;
+    const viewPortHeight =
+      window.innerHeight ||
+      document.documentElement.clientHeight ||
+      document.body.clientHeight;
+    // 窗口宽度是否达到规定阈值
+    const thresholdWidth = viewPortWidth <= responsiveWidth;
+    // 窗口高度是否达到规定阈值
+    const thresholdHeight = viewPortHeight <= responsiveHeight;
+    let _dimensions = { width: viewPortWidth, height: viewPortHeight };
+
+    if (scrollBar || thresholdWidth || thresholdHeight) {
+      Object.assign(_dimensions, {
+        width: isVertical ? "100%" : viewPortWidth,
+        height: isVertical ? viewPortHeight : "100%"
+      });
+    }
+
     setDimensions(_dimensions);
   };
 
@@ -141,48 +181,47 @@ function FullpageComponent(
     scroll(-1);
   };
 
-  const fullpageStyle = isVertical
-    ? {
-        flexDirection: "column",
-        width: dimensions.width,
-        height: dimensions.height * pageCount
-      }
-    : {
-        flexDirection: "row",
-        width: dimensions.width * pageCount,
-        height: dimensions.height
-      };
+  const FULLPAGE_STYLE = Object.assign(
+    {},
+    {
+      flexDirection: isVertical ? "column" : "row",
+      width: isVertical ? dimensions.width : dimensions.width * pageCount,
+      height: isVertical ? dimensions.height * pageCount : dimensions.height
+    }
+  );
+
+  const CONTAINER_STYLE = Object.assign({}, dimensions, {
+    overflow: pauseListenScrollWheel ? "" : "hidden"
+  });
 
   return (
     <ReactScrollWheelHandler
       className={styles.container}
-      style={dimensions}
+      style={CONTAINER_STYLE}
       upHandler={upHandler}
       downHandler={downHandler}
       leftHandler={leftHandler}
       rightHandler={rightHandler}
       timeout={pageTimeout}
+      pauseListeners={pauseListenScrollWheel}
     >
       <div
         className={styles.fullpage}
         style={{
-          ...fullpageStyle,
+          ...FULLPAGE_STYLE,
           display: "flex",
           transform: `translate${isVertical ? "Y" : "X"}(${-offset}px)`,
           transitionDuration: `${duration / 1000}s`
         }}
       >
         {children.map((item, index) => (
-          <div
-            key={index}
-            style={{ width: dimensions.width, height: dimensions.height }}
-          >
+          <div key={index} style={dimensions}>
             {item}
           </div>
         ))}
       </div>
       <Pagination
-        pagination={pagination}
+        pagination={visiblePagination}
         paginationType={paginationType}
         isVertical={isVertical}
         pageCount={pageCount}
@@ -190,7 +229,7 @@ function FullpageComponent(
         handleChangePage={setCurrentPage}
       />
       <Navigation
-        navigation={navigation}
+        navigation={visibleNavigation}
         isVertical={isVertical}
         handlePrev={slidePrev}
         handleNext={slideNext}
@@ -205,6 +244,7 @@ const Fullpage = forwardRef(FullpageComponent);
 
 Fullpage.prototype = {
   initPage: PropTypes.number,
+  scrollBar: PropTypes.bool,
   duration: PropTypes.number,
   pageTimeout: PropTypes.number,
   direction: PropTypes.oneOf(["horizontal", "vertical"]),
@@ -212,14 +252,19 @@ Fullpage.prototype = {
   paginationType: PropTypes.string,
   navigation: PropTypes.bool,
   renderPrevButton: PropTypes.func,
-  renderNextButton: PropTypes.func
+  renderNextButton: PropTypes.func,
+  responsiveWidth: PropTypes.number,
+  responsiveHeight: PropTypes.number
 };
 
 Fullpage.defaultProps = {
   initPage: 1,
+  scrollBar: false,
   duration: 300,
   pageTimeout: 300,
-  direction: "vertical"
+  direction: "vertical",
+  responsiveWidth: 0,
+  responsiveHeight: 0
 };
 
 export default Fullpage;

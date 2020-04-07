@@ -6,14 +6,14 @@ function App() {
   const commonStyle = {
     display: "flex",
     justifyContent: "center",
-    alignItems: "center",
+    alignItems: "center"
   };
 
   const ref = useRef();
 
   return (
     <div className="App">
-      <Fullpage ref={ref} direction="vertical">
+      <Fullpage ref={ref} direction="vertical" paginationType="number">
         <FullpageItem style={{ ...commonStyle, backgroundColor: "#f90" }}>
           Page1
           <button onClick={() => ref.current.slideNext()}>next</button>

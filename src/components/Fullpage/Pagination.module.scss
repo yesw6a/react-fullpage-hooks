@@ -28,8 +28,14 @@
   height: $DOT_SIZE;
   background-color: #fff;
   border-radius: 50%;
+  cursor: pointer;
 }
 
 .paginationDotActive {
   background-color: #000;
+}
+
+.paginationNum {
+  font-size: medium;
+  color: #fff;
 }

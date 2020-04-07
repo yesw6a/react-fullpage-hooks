@@ -2,7 +2,7 @@ import React, {
   useState,
   useLayoutEffect,
   forwardRef,
-  useImperativeHandle,
+  useImperativeHandle
 } from "react";
 import PropTypes from "prop-types";
 import ReactScrollWheelHandler from "react-scroll-wheel-handler";
@@ -41,7 +41,7 @@ function FullpageComponent(
 
   useImperativeHandle(ref, () => ({
     slideNext,
-    slidePrev,
+    slidePrev
   }));
 
   const init = () => {
@@ -57,7 +57,7 @@ function FullpageComponent(
   const getSize = () => {
     const _dimensions = {
       width: window.innerWidth,
-      height: window.innerHeight,
+      height: window.innerHeight
     };
     setDimensions(_dimensions);
   };
@@ -66,7 +66,7 @@ function FullpageComponent(
    * 翻页逻辑
    * @param {number} n - 翻页参数，n<0：向前（上）翻n页，n>0：向后（下）翻n页
    */
-  const scroll = (n) => {
+  const scroll = n => {
     if (n < 0 && currentPage === 0) {
       return false;
     }
@@ -90,12 +90,12 @@ function FullpageComponent(
     ? {
         flexDirection: "column",
         width: dimensions.width,
-        height: dimensions.height * pageCount,
+        height: dimensions.height * pageCount
       }
     : {
         flexDirection: "row",
         width: dimensions.width * pageCount,
-        height: dimensions.height,
+        height: dimensions.height
       };
 
   return (
@@ -111,7 +111,7 @@ function FullpageComponent(
           ...fullpageStyle,
           display: "flex",
           transform: `translate${isVertical ? "Y" : "X"}(${-offset}px)`,
-          transitionDuration: `${duration}s`,
+          transitionDuration: `${duration}s`
         }}
       >
         {children.map((item, index) => (
@@ -129,6 +129,7 @@ function FullpageComponent(
         isVertical={isVertical}
         pageCount={pageCount}
         currentPage={currentPage}
+        handleChangePage={setCurrentPage}
       />
     </ReactScrollWheelHandler>
   );
@@ -141,13 +142,13 @@ Fullpage.prototype = {
   duration: PropTypes.number,
   direction: PropTypes.oneOf(["horizontal", "vertical"]),
   pagination: PropTypes.bool,
-  paginationType: PropTypes.string,
+  paginationType: PropTypes.string
 };
 
 Fullpage.defaultProps = {
   initPage: 1,
   duration: 0.3,
-  direction: "vertical",
+  direction: "vertical"
 };
 
 export default Fullpage;

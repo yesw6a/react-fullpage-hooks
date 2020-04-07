@@ -2,7 +2,8 @@ import React from "react";
 import PropTypes from "prop-types";
 import classNames from "classnames";
 
-import styles from "./Pagination.module.scss";
+import styles from "./style.module.scss";
+
 function Pagination({
   pagination,
   paginationType,

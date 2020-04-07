@@ -10,10 +10,22 @@ import ReactScrollWheelHandler from "react-scroll-wheel-handler";
 import debounce from "@/lib/debounce";
 
 import styles from "./Fullpage.module.scss";
-import Pagination from "./Pagination";
+import Pagination from "./components/Pagination";
+import Navigation from "./components/Navigation";
 
 function FullpageComponent(
-  { children, initPage, duration, direction, pagination, paginationType },
+  {
+    children,
+    initPage,
+    duration,
+    pageTimeout,
+    direction,
+    pagination,
+    paginationType,
+    navigation,
+    renderPrevButton,
+    renderNextButton
+  },
   ref
 ) {
   const pageCount = children.length;
@@ -26,8 +38,14 @@ function FullpageComponent(
   useLayoutEffect(() => {
     init();
     window.addEventListener("resize", onResize);
+    document.body.addEventListener("touchmove", onTouchMove, {
+      passive: false
+    });
     return () => {
       window.removeEventListener("resize", onResize);
+      document.body.removeEventListener("touchmove", onTouchMove, {
+        passive: false
+      });
     };
     // eslint-disable-next-line
   }, []);
@@ -52,6 +70,11 @@ function FullpageComponent(
   const onResize = debounce(() => {
     getSize();
   }, 200);
+
+  // 禁止网页橡皮筋效果
+  const onTouchMove = e => {
+    e.preventDefault();
+  };
 
   // 获取并设置当前窗口尺寸
   const getSize = () => {
@@ -86,6 +109,38 @@ function FullpageComponent(
     scroll(-1);
   };
 
+  // 监听向上滚动
+  const upHandler = () => {
+    if (!isVertical) {
+      return false;
+    }
+    scroll(-1);
+  };
+
+  // 监听向下滚动
+  const downHandler = () => {
+    if (!isVertical) {
+      return false;
+    }
+    scroll(1);
+  };
+
+  // 监听向左滚动
+  const leftHandler = () => {
+    if (isVertical) {
+      return false;
+    }
+    scroll(1);
+  };
+
+  // 监听向右滚动
+  const rightHandler = () => {
+    if (isVertical) {
+      return false;
+    }
+    scroll(-1);
+  };
+
   const fullpageStyle = isVertical
     ? {
         flexDirection: "column",
@@ -102,8 +157,11 @@ function FullpageComponent(
     <ReactScrollWheelHandler
       className={styles.container}
       style={dimensions}
-      upHandler={() => scroll(-1)}
-      downHandler={() => scroll(1)}
+      upHandler={upHandler}
+      downHandler={downHandler}
+      leftHandler={leftHandler}
+      rightHandler={rightHandler}
+      timeout={pageTimeout}
     >
       <div
         className={styles.fullpage}
@@ -111,7 +169,7 @@ function FullpageComponent(
           ...fullpageStyle,
           display: "flex",
           transform: `translate${isVertical ? "Y" : "X"}(${-offset}px)`,
-          transitionDuration: `${duration}s`
+          transitionDuration: `${duration / 1000}s`
         }}
       >
         {children.map((item, index) => (
@@ -131,6 +189,14 @@ function FullpageComponent(
         currentPage={currentPage}
         handleChangePage={setCurrentPage}
       />
+      <Navigation
+        navigation={navigation}
+        isVertical={isVertical}
+        handlePrev={slidePrev}
+        handleNext={slideNext}
+        renderPrevButton={renderPrevButton}
+        renderNextButton={renderNextButton}
+      />
     </ReactScrollWheelHandler>
   );
 }
@@ -140,14 +206,19 @@ const Fullpage = forwardRef(FullpageComponent);
 Fullpage.prototype = {
   initPage: PropTypes.number,
   duration: PropTypes.number,
+  pageTimeout: PropTypes.number,
   direction: PropTypes.oneOf(["horizontal", "vertical"]),
   pagination: PropTypes.bool,
-  paginationType: PropTypes.string
+  paginationType: PropTypes.string,
+  navigation: PropTypes.bool,
+  renderPrevButton: PropTypes.func,
+  renderNextButton: PropTypes.func
 };
 
 Fullpage.defaultProps = {
   initPage: 1,
-  duration: 0.3,
+  duration: 300,
+  pageTimeout: 300,
   direction: "vertical"
 };
 

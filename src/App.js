@@ -11,9 +11,26 @@ function App() {
 
   const ref = useRef();
 
+  const isMobile = () => {
+    if (
+      navigator.userAgent.match(
+        /(phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone)/i
+      )
+    ) {
+      return true;
+    }
+    return false;
+  };
+
   return (
     <div className="App">
-      <Fullpage ref={ref} direction="vertical" paginationType="number">
+      <Fullpage
+        ref={ref}
+        direction={isMobile() ? "horizontal" : "vertical"}
+        paginationType="dot"
+        navigation
+        renderPrevButton={() => <div>Prev</div>}
+      >
         <FullpageItem style={{ ...commonStyle, backgroundColor: "#f90" }}>
           Page1
           <button onClick={() => ref.current.slideNext()}>next</button>

@@ -27,7 +27,6 @@ function FullpageComponent(
     navigation,
     renderPrevButton,
     renderNextButton,
-    responsiveWidth,
     responsiveHeight
   },
   ref
@@ -65,8 +64,8 @@ function FullpageComponent(
   }, [currentPage, dimensions]);
 
   useEffect(() => {
-    const { width, height } = dimensions;
-    if (scrollBar || width <= responsiveWidth || height <= responsiveHeight) {
+    const { height } = dimensions;
+    if ((scrollBar || height <= responsiveHeight) && isVertical) {
       setPauseListenScrollWheel(true);
       setOffset(0);
       setVisibleNavigation(false);
@@ -109,17 +108,12 @@ function FullpageComponent(
       window.innerHeight ||
       document.documentElement.clientHeight ||
       document.body.clientHeight;
-    // 窗口宽度是否达到规定阈值
-    const thresholdWidth = viewPortWidth <= responsiveWidth;
     // 窗口高度是否达到规定阈值
     const thresholdHeight = viewPortHeight <= responsiveHeight;
     let _dimensions = { width: viewPortWidth, height: viewPortHeight };
 
-    if (scrollBar || thresholdWidth || thresholdHeight) {
-      Object.assign(_dimensions, {
-        width: isVertical ? "100%" : viewPortWidth,
-        height: isVertical ? viewPortHeight : "100%"
-      });
+    if ((scrollBar || thresholdHeight) && isVertical) {
+      Object.assign(_dimensions, { width: "100%" });
     }
 
     setDimensions(_dimensions);
@@ -253,7 +247,6 @@ Fullpage.prototype = {
   navigation: PropTypes.bool,
   renderPrevButton: PropTypes.func,
   renderNextButton: PropTypes.func,
-  responsiveWidth: PropTypes.number,
   responsiveHeight: PropTypes.number
 };
 
@@ -263,7 +256,6 @@ Fullpage.defaultProps = {
   duration: 300,
   pageTimeout: 300,
   direction: "vertical",
-  responsiveWidth: 0,
   responsiveHeight: 0
 };
 

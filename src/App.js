@@ -32,6 +32,7 @@ function App() {
         renderPrevButton={() => <div>Prev</div>}
         // scrollBar
         responsiveHeight={800}
+        anchor={["p1", "p2", "p3", "p4"]}
       >
         <FullpageItem style={{ ...commonStyle, backgroundColor: "#f90" }}>
           Page1

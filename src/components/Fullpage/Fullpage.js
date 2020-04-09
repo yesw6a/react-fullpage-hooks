@@ -14,6 +14,11 @@ import styles from "./Fullpage.module.scss";
 import Pagination from "./components/Pagination";
 import Navigation from "./components/Navigation";
 
+const locationHash = window.location.hash.match(/#(.*?)#|#(.*)/);
+const locationRealHash = locationHash
+  ? locationHash[1] || locationHash[2]
+  : null;
+
 function FullpageComponent(
   {
     children,
@@ -25,6 +30,7 @@ function FullpageComponent(
     pagination,
     paginationType,
     navigation,
+    anchor,
     renderPrevButton,
     renderNextButton,
     responsiveHeight
@@ -33,13 +39,22 @@ function FullpageComponent(
 ) {
   const pageCount = children.length;
   const isVertical = direction === "vertical";
+  const pageControllerInit = {
+    visibleNavigation: navigation, // 是否显示分页按钮
+    visiblePagination: pagination, // 是否显示轮播指示器
+    pauseListenScrollWheel: false // 是否监听scroll操作
+  };
 
-  const [currentPage, setCurrentPage] = useState(0); // 当前页面
+  const [currentPage, setCurrentPage] = useState(initPage); // 当前页面
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 }); // 页面尺寸
-  const [visibleNavigation, setVisibleNavigation] = useState(navigation); // 是否显示分页按钮
-  const [visiblePagination, setVisiblePagination] = useState(pagination);
+  const [pageController, setPageController] = useState(pageControllerInit);
   const [offset, setOffset] = useState(0);
-  const [pauseListenScrollWheel, setPauseListenScrollWheel] = useState(false);
+
+  const {
+    visibleNavigation,
+    visiblePagination,
+    pauseListenScrollWheel
+  } = pageController;
 
   useLayoutEffect(() => {
     init();
@@ -58,22 +73,32 @@ function FullpageComponent(
 
   useLayoutEffect(() => {
     const { width, height } = dimensions;
-    const _offset = currentPage * (isVertical ? height : width);
-    setOffset(_offset);
+    if (width > 0 && height > 0) {
+      const _offset = currentPage * (isVertical ? height : width);
+      setOffset(_offset);
+    }
     // eslint-disable-next-line
   }, [currentPage, dimensions]);
 
   useEffect(() => {
     const { height } = dimensions;
     if ((scrollBar || height <= responsiveHeight) && isVertical) {
-      setPauseListenScrollWheel(true);
       setOffset(0);
-      setVisibleNavigation(false);
-      setVisiblePagination(false);
+      setPageController(
+        Object.assign({}, pageController, {
+          visibleNavigation: false,
+          visiblePagination: false,
+          pauseListenScrollWheel: true
+        })
+      );
     } else {
-      setPauseListenScrollWheel(false);
-      setVisibleNavigation(navigation);
-      setVisiblePagination(pagination);
+      setPageController(
+        Object.assign({}, pageController, {
+          visibleNavigation: navigation,
+          visiblePagination: pagination,
+          pauseListenScrollWheel: false
+        })
+      );
     }
     // eslint-disable-next-line
   }, [dimensions]);
@@ -85,8 +110,18 @@ function FullpageComponent(
   }));
 
   const init = () => {
+    if (Array.isArray(anchor)) {
+      let _currentPage = currentPage;
+      for (const index in anchor) {
+        if (anchor[index] === locationRealHash) {
+          _currentPage = Number(index);
+          break;
+        }
+      }
+
+      jumpPage(_currentPage);
+    }
     getSize();
-    setCurrentPage(initPage);
   };
 
   const onResize = debounce(() => {
@@ -130,7 +165,16 @@ function FullpageComponent(
     if (n > 0 && currentPage === pageCount - 1) {
       return false;
     }
-    setCurrentPage(currentPage + n);
+
+    jumpPage(currentPage + n);
+  };
+
+  // 跳转到指定页
+  const jumpPage = page => {
+    if (Array.isArray(anchor)) {
+      window.location.hash = anchor[page];
+    }
+    setCurrentPage(page);
   };
 
   // 翻到下一页
@@ -208,11 +252,13 @@ function FullpageComponent(
           transitionDuration: `${duration / 1000}s`
         }}
       >
-        {children.map((item, index) => (
-          <div key={index} style={dimensions}>
-            {item}
-          </div>
-        ))}
+        {children.map((item, index) => {
+          return (
+            <div key={index} style={dimensions}>
+              {item}
+            </div>
+          );
+        })}
       </div>
       <Pagination
         pagination={visiblePagination}
@@ -220,7 +266,7 @@ function FullpageComponent(
         isVertical={isVertical}
         pageCount={pageCount}
         currentPage={currentPage}
-        handleChangePage={setCurrentPage}
+        handleChangePage={jumpPage}
       />
       <Navigation
         navigation={visibleNavigation}
@@ -245,6 +291,7 @@ Fullpage.prototype = {
   pagination: PropTypes.bool,
   paginationType: PropTypes.string,
   navigation: PropTypes.bool,
+  anchor: PropTypes.oneOfType([PropTypes.bool, PropTypes.array]),
   renderPrevButton: PropTypes.func,
   renderNextButton: PropTypes.func,
   responsiveHeight: PropTypes.number
@@ -256,7 +303,8 @@ Fullpage.defaultProps = {
   duration: 300,
   pageTimeout: 300,
   direction: "vertical",
-  responsiveHeight: 0
+  responsiveHeight: 0,
+  anchor: false
 };
 
 export default Fullpage;

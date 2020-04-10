@@ -1,6 +1,5 @@
 import React, { useRef } from "react";
-import "./App.css";
-import { Fullpage, FullpageItem } from "@/components/Fullpage";
+import { Fullpage, FullpageItem } from "../../src";
 
 function App() {
   const commonStyle = {
@@ -23,10 +22,11 @@ function App() {
   };
 
   return (
-    <div className="App">
+    <div>
       <Fullpage
         ref={ref}
         direction={isMobile() ? "horizontal" : "vertical"}
+        pagination
         paginationType="dot"
         navigation
         renderPrevButton={() => <div>Prev</div>}

@@ -7,8 +7,8 @@ import React, {
 } from "react";
 import PropTypes from "prop-types";
 import ReactScrollWheelHandler from "react-scroll-wheel-handler";
-// import throttle from "@/lib/throttle";
-import debounce from "@/lib/debounce";
+// import throttle from "./lib/throttle";
+import debounce from "./lib/debounce";
 
 import styles from "./Fullpage.module.scss";
 import Pagination from "./components/Pagination";

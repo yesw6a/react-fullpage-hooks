@@ -3,7 +3,7 @@ import classNames from "classnames";
 
 import styles from "./FullpageItem.module.scss";
 
-function FullpageItem({ children, className, style }) {
+function useFullpageItem({ children, className, style }) {
   return (
     <div className={classNames(styles.itemWrapper, className)} style={style}>
       {children}
@@ -11,4 +11,4 @@ function FullpageItem({ children, className, style }) {
   );
 }
 
-export default FullpageItem;
+export default useFullpageItem;

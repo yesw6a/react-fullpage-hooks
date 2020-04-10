@@ -280,9 +280,9 @@ function FullpageComponent(
   );
 }
 
-const Fullpage = forwardRef(FullpageComponent);
+const useFullpage = forwardRef(FullpageComponent);
 
-Fullpage.prototype = {
+useFullpage.prototype = {
   initPage: PropTypes.number,
   scrollBar: PropTypes.bool,
   duration: PropTypes.number,
@@ -297,7 +297,7 @@ Fullpage.prototype = {
   responsiveHeight: PropTypes.number
 };
 
-Fullpage.defaultProps = {
+useFullpage.defaultProps = {
   initPage: 1,
   scrollBar: false,
   duration: 300,
@@ -307,4 +307,4 @@ Fullpage.defaultProps = {
   anchor: false
 };
 
-export default Fullpage;
+export default useFullpage;

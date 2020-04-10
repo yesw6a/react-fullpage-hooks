@@ -5,13 +5,12 @@ const MiniCssExtractPlugin = require("mini-css-extract-plugin"); // 用于将组
 const autoprefixer = require("autoprefixer");
 
 const prodConfig = {
-  mode: "production", // 开发模式
+  mode: "production", // 生产模式
   entry: path.join(__dirname, "../src/index.js"),
   output: {
     path: path.join(__dirname, "../lib/"),
-    filename: "index.js",
-    libraryTarget: "umd", // 采用通用模块定义
-    libraryExport: "default", // 兼容 ES6 的模块系统、CommonJS 和 AMD 模块规范
+    filename: "fullpage.min.js",
+    libraryTarget: "commonjs2", // 采用通用模块定义
   },
   module: {
     rules: [

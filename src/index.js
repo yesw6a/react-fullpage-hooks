@@ -1,4 +1,4 @@
-import Fullpage from "./Fullpage";
-import FullpageItem from "./FullpageItem";
+import useFullpage from "./useFullpage";
+import useFullpageItem from "./useFullpageItem";
 
-export { Fullpage, FullpageItem };
+export { useFullpage, useFullpageItem };
